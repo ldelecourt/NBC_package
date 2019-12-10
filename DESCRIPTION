@@ -1,0 +1,24 @@
+Package: NBC
+Title: Original Implementation of Naive Bayes Classifier
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Leo",
+           family = "Delecourt",
+           role = c("aut", "cre"),
+           email = "leo.delecourt@univ-lyon2.fr",
+           comment = c(ORCID = "YOUR-ORCID-ID"))
+Description: This package provide several functions converging towards the same goal, prediction. The implementation of a Naive Bayes Classifier is proposed here through two main functions: \strong{fit} to create the model and \strong{predict} to compute posterior probablities and thus predict in which class belongs the given observation. This package handle all types of variables and discretize any numeric data. It also proposes parallel computation and laplace smoothing.
+License: GNU General Public License
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+Imports: 
+    discretization,
+    stats,
+    doParallel,
+    foreach,
+    parallel
+RoxygenNote: 7.0.2

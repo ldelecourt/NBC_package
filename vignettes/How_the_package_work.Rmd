@@ -1,0 +1,23 @@
+---
+title: "How_the_package_work"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How_the_package_work}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(NBC)
+```
+
+
+
+
