@@ -64,7 +64,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
 
     if (parallel==TRUE) {
       # Initialisation de la parallelisation
-      nb_cores <- detectCores()
+      nb_cores <- detectCores() - 1
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
 
@@ -108,7 +108,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
 
       # On calcul les prediction sur les données discrétisée
       ###### PARALLELISATION ######
-      nb_cores <- detectCores()
+      nb_cores <- detectCores() - 1
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
       pred <- foreach(i=1:nrow(test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
@@ -172,7 +172,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
   else {
     # On calcul les prediction sur les données (qualitatives)
     ###### PARALLELISATION ######
-    nb_cores <- detectCores()
+    nb_cores <- detectCores() - 1
     cl <- makeCluster(nb_cores)
 
     registerDoParallel(cl)

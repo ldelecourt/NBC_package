@@ -106,7 +106,11 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
     # Table frequence variable a predire
     table_Y <- table(quali[ ,1])
 
-    warning("Laplace smoothing at 1 is used by default !!!")
+    if (laplace == 1) {
+      warning("Laplace smoothing at 1 is used by default !!!")
+    } else {
+      warning("Laplace smoothing at ", laplace, " is used !!!")
+    }
     for (i in 2:ncol(quali)) {
       # Table de frequence variable explicative
       table_freq <- table(quali[ ,i], quali[ ,1])
@@ -142,7 +146,7 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
       df_disc$Disc.data <- cbind(df_disc$Disc.data, quali)
 
     } else if (parallel==TRUE) {
-      nb_cores <- detectCores()
+      nb_cores <- detectCores() - 1
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
       quanti_discret <- foreach(i=1:ncol(quanti), .combine="c", .export=c("discret", "mdlp")) %dopar%
@@ -171,7 +175,11 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
     # Table frequence variable a predire
     table_Y <- table(Y)
 
-    warning("Laplace smoothing at 1 is used by default !!!")
+    if (laplace == 1) {
+      warning("Laplace smoothing at 1 is used by default !!!")
+    } else {
+      warning("Laplace smoothing at ", laplace, " is used !!!")
+    }
     for (i in which(names(df_disc$Disc.data) != names(Y))) {
       # Table de frequence variable explicative
       table_freq <- table(df_disc$Disc.data[ ,i], Y[,1])
