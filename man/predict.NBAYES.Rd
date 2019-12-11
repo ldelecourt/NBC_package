@@ -18,7 +18,7 @@ of the prediction. And "both" that will return both "posterior" and "class" info
 \item{parallel}{a logic that allow the user to compute the function using parallel computation.}
 }
 \value{
-a dataframe containing the posterior probabilities, the predict class or both them.
+a dataframe containing the posterior probabilities, the predict class or both of them.
 }
 \description{
 Compute posterior probabilities and class based on Naive Bayes Classifier

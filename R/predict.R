@@ -13,7 +13,7 @@
 #' of the prediction. And "both" that will return both "posterior" and "class" informations.
 #' @param parallel a logic that allow the user to compute the function using parallel computation.
 #'
-#' @return a dataframe containing the posterior probabilities, the predict class or both them.
+#' @return a dataframe containing the posterior probabilities, the predict class or both of them.
 #'
 #' @examples
 #' data(iris)
@@ -36,8 +36,12 @@
 
 #### FONCTION PREDICTION POUR UN OBJET NBAYES ####
 predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE) {       # ajouter une option type('class' ou 'posterior')
+  # Checkings dataframe
   if (class(object_NBAYES) != "NBAYES") {
     stop("The object you gave is not a NBAYES object")
+  }
+  if ((type!="class") & (type!="posterior") & (type!="both")) {
+    stop('Wrong argument type! Must be "class", "posterior" or "both"')
   }
 
   table_conditionnelle <- object_NBAYES$table_proba_cond

@@ -4,7 +4,7 @@
 #' print different information about an NBAYES object
 #'
 #' @usage
-#' print(NBAYES)
+#' print.NBAYES(NBAYES)
 #'
 #' @param NBAYES an NBAYES object
 #'
@@ -21,10 +21,10 @@
 #Surcharge de la methode print
 print.NBAYES<-function(NBAYES){
   for (i in 1:length(NBAYES$table_proba_cond)){
-    cat("Probabilit?s conditionnelles de la variable",names(NBAYES$table_proba_cond[i])," :","\n")
+    cat("Conditionnal Probabilities for the variable",names(NBAYES$table_proba_cond[i])," :","\n")
     print(NBAYES$table_proba_cond[[i]])
     cat("\n")
   }
-  cat("Probabilit?s ? priori :","\n")
+  cat("Prior probability :","\n")
   print(NBAYES$prior)
 }

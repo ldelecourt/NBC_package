@@ -12,8 +12,9 @@ discret(colonne, Y)
 \item{Y}{the column of a dataframe containing modalities to predict}
 }
 \value{
-df_disc a dataframe with the variable colonne discretize, cuts a list giving the cuts made by the mdlp()
-function
+\strong{df_disc}, a dataframe with the variable colonne discretize
+
+\strong{cuts}, a list giving the cuts made by the mdlp() function
 }
 \description{
 Discretization using the mdlp() function from the package discretization

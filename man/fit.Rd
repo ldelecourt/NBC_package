@@ -16,8 +16,21 @@ fit(formula, data, laplace=1, parallel=FALSE)
 \item{parallel}{a logic that allow the user to compute the function using parallel computation.}
 }
 \value{
-an NBAYES object containing several information that can be useful for the user but more important
-for the predict function
+an NBAYES object containing several information that can be useful for the user and had to pass to the
+predict function. The informations depends if the fit had to discretize or not.
+For both cases the fit return:
+
+\strong{NBAYES$table_proba_cond}, a table containing he conditionnal probabilities
+
+\strong{NBAYES$prior}, a table full by the prior probabilities
+
+Plus, if discretization occured:
+
+\strong{NBAYES$condition}, a dataframe with names of the column that was discretize and their column number
+
+\strong{NBAYES$cuts}, a list of cuts made by discretization
+
+\strong{NBAYES$var_a_predire}, the name of the variable to predict
 }
 \description{
 fit is used to fit the Naive Bayes Classifier model. It can compute with all types of variables,
@@ -26,6 +39,6 @@ applying discretisation on quantitative variables and need a qualitative predict
 \examples{
 data(iris)
 df <- iris
-model <- NBC::fit(Species ~ ., data, laplace=1, parallel=FALSE)
+model <- fit(Species ~ ., df, laplace=1, parallel=FALSE)
 
 }

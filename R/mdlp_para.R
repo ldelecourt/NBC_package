@@ -9,8 +9,8 @@
 #' @param colonne the column of a dataframe that will be discretize, must be numeric
 #' @param Y the column of a dataframe containing modalities to predict
 #'
-#' @return df_disc a dataframe with the variable colonne discretize, cuts a list giving the cuts made by the mdlp()
-#' function
+#' @return \strong{df_disc}, a dataframe with the variable colonne discretize
+#' @return \strong{cuts}, a list giving the cuts made by the mdlp() function
 #'
 #'
 #' @examples

@@ -4,7 +4,7 @@
 \alias{print.NBAYES}
 \title{Print NBAYES object attributes}
 \usage{
-print(NBAYES)
+print.NBAYES(NBAYES)
 }
 \arguments{
 \item{NBAYES}{an NBAYES object}

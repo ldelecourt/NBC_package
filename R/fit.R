@@ -12,13 +12,22 @@
 #' @param laplace an integer that will be use to do the Laplace smoothing.
 #' @param parallel a logic that allow the user to compute the function using parallel computation.
 #'
-#' @return an NBAYES object containing several information that can be useful for the user but more important
-#' for the predict function
+#' @return an NBAYES object containing several information that can be useful for the user and had to pass to the
+#' predict function. The informations depends if the fit had to discretize or not.
+#' For both cases the fit return:
+#' @return \strong{NBAYES$table_proba_cond}, a table containing he conditionnal probabilities
+#' @return \strong{NBAYES$prior}, a table full by the prior probabilities
+#'
+#' Plus, if discretization occured:
+#' @return \strong{NBAYES$condition}, a dataframe with names of the column that was discretize and their column number
+#' @return \strong{NBAYES$cuts}, a list of cuts made by discretization
+#' @return \strong{NBAYES$var_a_predire}, the name of the variable to predict
+#'
 #'
 #' @examples
 #' data(iris)
 #' df <- iris
-#' model <- NBC::fit(Species ~ ., data, laplace=1, parallel=FALSE)
+#' model <- fit(Species ~ ., df, laplace=1, parallel=FALSE)
 #'
 #' @import discretization
 #' @import stats
@@ -37,10 +46,22 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
   # Nom de l'objet en sortie
   NBAYES <- list()
 
+  # Some checks
+  laplace <- as.integer(laplace)
+  if ((class(laplace) != "integer") || laplace < 0) {
+    stop("laplace parameter must be an integer greater than 0!")
+  }
+
   # On extrait le dataframe de l'argument 'formula'
   # en supprimant les lignes comportant des NA
   formula <- as.formula(formula)
-  df <- na.omit(model.frame(formula = formula, data=data))
+  df <- na.omit(model.frame(formula=formula, data=data))
+
+  # Check dataframe
+  condition <- sum(sapply(df, class) == "complex") > 0
+  if (condition) {
+    stop("complex data type detected, do not handle that type of variables")
+  }
 
   # Nombre de colonne df
   n_var <- ncol(df)
@@ -99,7 +120,7 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
     }
 
     # Probabilites A Priori
-    proba_Y <- prop.table(table_Y + 1)
+    proba_Y <- prop.table(table_Y + laplace)
     NBAYES$prior <- proba_Y
 
     # We're almost done
@@ -147,7 +168,6 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
     }
 
 
-
     # Table frequence variable a predire
     table_Y <- table(Y)
 
@@ -165,16 +185,15 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
     }
 
     # Probabilites A Priori
-    proba_Y <- prop.table(table_Y + 1)
+    proba_Y <- prop.table(table_Y + laplace)
     NBAYES$prior <- proba_Y
 
     # Donnees a passer dans le predict()
-    NBAYES$discretiz     <- TRUE
     # Colonnes ayant subit discretisation
     NBAYES$condition     <- which(sapply(df_disc$Disc.data, class) == "integer")
-    # Nbre de colonne du jeu de donnee d'entrainement
-    NBAYES$n_col_train   <- ncol(df)
+    # Les cuts de la discretisation
     NBAYES$cuts          <- df_disc$cutp
+    # Le nom de la variable a predire
     NBAYES$var_a_predire <- formula[[2]]
 
     # We're almost done
