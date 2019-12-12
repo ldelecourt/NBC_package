@@ -17,6 +17,18 @@
 #' @export
 
 
+# Fonction permettant le calcul des probabilités à posteriori
+# Implémentation pour rendre possible sa parallélisation
+
+# 1) Récupération du log du prior de la 1er modalité à prédire
+# 2) Somme des log des probabilités conditionnelles des différentes variables avec le prior
+# 3) Insertion dans un vecteur de la valeur de posterior calculé pour la 1er modalité de la variables à prédire
+
+# Boucle ainsi sur toutes les modalités de la variable à prédire
+
+# Si besoin il est très facile de modifier le calcul et de retirer le calcul avec le log:
+# Commenter les parties P2 <- , proba2 <- et return(proba2)
+# Décommenter les parties P <- , proba1 <- et return(proba1)
 
 
 proba_1_obs <- function(ligne_df, nbayes) {
@@ -41,7 +53,6 @@ proba_1_obs <- function(ligne_df, nbayes) {
   }
   #return(proba1)
   return(proba2)
-  #return(list(proba1=proba1, proba2=proba2))
 }
 
 

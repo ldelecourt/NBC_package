@@ -24,6 +24,9 @@
 #'
 #' @export
 
+# Permet la discrétisation de la fonction mdlp() de la library(discretization)
+# tout en retournant les cuts indispensable à la fonction predict().
+# Cette fonction a été écrite pour rendre la parallélisation faisable dans la fonction fit().
 
 discret <- function(colonne, Y) {
   df <- mdlp(cbind(colonne, Y))

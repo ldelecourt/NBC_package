@@ -36,14 +36,23 @@
 
 #### FONCTION PREDICTION POUR UN OBJET NBAYES ####
 predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE) {       # ajouter une option type('class' ou 'posterior')
-  # Checkings dataframe
+  # Checking dataframe
+  # Si l'arguement object_NBAYES est bien un objet NBAYES
   if (class(object_NBAYES) != "NBAYES") {
     stop("The object you gave is not a NBAYES object")
   }
+  # Si l'utilisateur a bien rentrer un des trois type
   if ((type!="class") & (type!="posterior") & (type!="both")) {
     stop('Wrong argument type! Must be "class", "posterior" or "both"')
   }
 
+  # Si l'utilisateur passe un dataframe contenant déjà la variable à prédire, l'algorithme va la reconnaître
+  # et ne s'appuiera pas dessus pour calculer les prédictions, ses dernières resteront donc juste.
+  # En revanche si l'utilisateur passe un dataframe ayant des noms de colonnes différents que lors du fit,
+  # l'algorithme stop!!
+
+
+  # On a besoin de plusieurs variables générées par le fit
   table_conditionnelle <- object_NBAYES$table_proba_cond
   n_mod_predire <- dim(table_conditionnelle[[1]])[2]
   prior <- object_NBAYES$prior
@@ -51,47 +60,60 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
   variable_explicative <- colnames(table_conditionnelle[[1]])
 
 
+  # Le code se décompose (comme le fit) en deux partie. La 1er partie correspondant au traitement de données
+  # ayant subit une discrétisation dans le fit, la 2eme au dataframe
+
   condition1 <- sum(sapply(data_test, class) == "numeric")
   condition2 <-sum(sapply(data_test, class) == "integer")
 
+  # Si des variables à discrétiser sont présentes
   if ((condition1 > 0) | (condition2 > 0)) {
     # discretization des colonnes ayant ete discretiser dans le fit()
     # la condition permet de ne pas discrétiser la variable a predire qui n'existe pas dans les donnees test
-    # si celle-ci a te discretisee
     condition <- object_NBAYES$condition
     var_a_predire <- object_NBAYES$var_a_predire
 
 
+    # Toujours la possibilité pour l'utilisateur d'effectué les calculs en parallèle
     if (parallel==TRUE) {
       # Initialisation de la parallelisation
       nb_cores <- detectCores() - 1
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
 
+      # Condition sur le nombre de colonee et si la variable à predire est présente ou pas dans le jeu de donnee test
       if (sum(names(condition) == var_a_predire) == 1) {
         condition <- condition[-which(names(condition) == var_a_predire)]
 
+        # Discretisation des colonnes suivant le même découpage réaliser par la fonction mdlp() dans le fit
+        # On boucle en parallele sur la variable condition, permettant de savoir quelle colonne doit subir
+        # la discretisation (voir doc discretisation() pour plus d'information)
         data_test <- foreach(i=1:length(condition), .combine=cbind, .export=c("discretisation")) %dopar%
           discretisation(data_test[names(condition[i])] , object_NBAYES$cuts[[condition[i]]])
         stopCluster(cl)
 
       } else {
 
+        # Discretisation des colonnes suivant le même découpage réaliser par la fonction mdlp() dans le fit
         data_test <- foreach(i=1:length(condition), .combine=cbind, .export=c("discretisation")) %dopar%
           discretisation(data_test[names(condition[i])] , object_NBAYES$cuts[[condition[i]]])
         stopCluster(cl)
       }
 
 
-      # On calcul les prediction sur les données discrétisée
+      # On calcul les prediction sur les données discrétisée, calcul du posterior
       ###### PARALLELISATION ######
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
+      # On boucle en parallele sur toutes les lignes du dataframe l'execution de la fonction proba_1_obs (Cf doc)
+      # et retourne un dataframe
       pred <- foreach(i=1:nrow(data_test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
       stopCluster(cl)
 
 
-
+      # Cette partie est la même que celle présentée précédemment mais de manière séquentielle
+      # Seul le calcul des probabilité a posteriori se font toujours en parallèle
+      # Discretisation à partir des cuts
     } else if (parallel==FALSE) {
       if (sum(names(condition) == var_a_predire) == 1) {
         condition <- condition[-which(names(condition) == var_a_predire)]
@@ -115,7 +137,10 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
       stopCluster(cl)
     }
 
+    # Arriver ici, nous avons un dataframe (pred), contenant les probabilités a posteriori correspondant
+    # à chaque modalité de la variable à prédire. Nous allons normaliser cela avec l'évidence
 
+    # calcul de l'évidence
     evidence_par <- seq(1, nrow(pred))
     for (i in 1:nrow(pred)) {
       evidence_par[i] <- abs(sum(pred[i,]))
@@ -131,10 +156,11 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
 
     # creation de la colonne "class"
     classe <- seq(1, nrow(pred))
-    #for (i in 1:nrow(pred)) {
-    #  classe[i] <- colnames(pred)[which.max(pred[i,])]
-    #}
 
+    # Suite à l'utilisation de la fonction profviz(), on a vu que cette partie du code pouvait prendre
+    # du temps, notamment pour les grosses bases. Ce qui justifie sa potentielle parallélisation.
+    # Ici on cherche juste à retrouver la valeur maximum de posterior pour chaque ligne pour ainsi définir
+    # à quelle classe l'observation appartient.
     if (parallel==TRUE) {
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
@@ -148,11 +174,14 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
     }
 
 
-    # Concatene les deux
+    # Concatene les deux, posterior et class
     pred <- cbind.data.frame(pred, classe)
     colnames(pred)[ncol(pred)] <- "class"
+
+
     # We're almost done!
     print("Prediction is done!")
+
 
     # Formatage resultat
     if (type == "class") {
@@ -167,6 +196,10 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
 
     return(list(prediction=pred))
   }
+
+
+  # Dans les cas où aucune discrétisation n'a été effectué lors du fit, nous passons directement à l'étape
+  # de calcul des posterior
 
   ###### ELSE ###### Pas besoin de discretiser
   else {
@@ -195,6 +228,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
     # creation de la colonne "class"
     classe <- seq(1, nrow(pred))
 
+    # Recherche de la classe équivalent au posterior maximum
     if (parallel==TRUE) {
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)

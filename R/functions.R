@@ -20,9 +20,13 @@
 #'
 #' @export
 
-
-
 # Discretisation à partir de cuts obtenu après la discretisation d'un autre jeu de données
+# Implémentation de cette méthode dans le but de parallélisation
+
+# Pour chaque ligne de la colonne passée, l'algorithme permet de vérifier dans quelle intervalle
+# la valeurs de la ligne se trouve. Les intervalles étant au préalable fournit (Cf fit).
+
+
 discretisation <- function(column, cuts) {
   nombre_cut_total <- length(cuts)
 

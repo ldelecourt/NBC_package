@@ -28,7 +28,7 @@ print.NBAYES <- function(NBAYES){
   cat("Prior probability:","\n")
   print(NBAYES$prior)
 
-  if (exists("NBAYES$cuts")) {
+  if (exists('NBAYES$cuts') && is.list('NBAYES$cuts')) {
     cat("Cuts:", "\n")
     print(NBAYES$cuts)
   }
