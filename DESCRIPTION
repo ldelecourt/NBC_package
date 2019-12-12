@@ -1,6 +1,6 @@
 Package: NBC
 Title: Original Implementation of Naive Bayes Classifier
-Version: 0.0.0.9000
+Version: 1.0.0.0
 Authors@R: c(
     person(given = "Leo", family = "Delecourt", role = c("aut", "cre"), email = "leo.delecourt@univ-lyon2.fr"),
     person(given = "Antoine", family = "Krieger", role = c("aut"), email = "antoine.krieger@univ-lyon2.fr"),
