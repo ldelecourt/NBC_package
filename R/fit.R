@@ -119,8 +119,14 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
       table_freq <-  table_freq + laplace   # On ajoute laplace=1 par défaut
 
       # Probabilite conditionnelle pour toutes les modalités de chaque variable
-      proba_explicative <- prop.table(table_freq, 2)
-      NBAYES$table_proba_cond[[colnames(quali[i])]] <- prop.table(table_freq, 2)
+      nrow_tbl <- nrow(table_freq)
+      if (nrow_tbl == 1) {
+        proba_explicative <- prop.table(table_freq, 1)
+      } else if (nrow_tbl > 1) {
+        proba_explicative <- prop.table(table_freq, 2)
+      }
+
+      NBAYES$table_proba_cond[[colnames(quali[i])]] <- proba_explicative
     }
 
     # Probabilites A Priori
@@ -144,6 +150,7 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
 
       # On concatene les quanti et quali pour retrouver le DF originel discretise
       df_disc$Disc.data <- cbind(df_disc$Disc.data, quali)
+      print(df_disc)
 
     } else if (parallel==TRUE) {
       nb_cores <- detectCores() - 1
@@ -182,14 +189,19 @@ fit <- function(formula, data, laplace=1, parallel=FALSE) {
     }
     for (i in which(names(df_disc$Disc.data) != names(Y))) {
       # Table de frequence variable explicative
-      table_freq <- table(df_disc$Disc.data[ ,i], Y[,1])
+      table_freq <- table(df_disc$Disc.data[ ,i], Y[ ,1])
 
       # Lissage de Laplace
       table_freq <-  table_freq + laplace   # On ajoute laplace=1 par défaut
 
       # Probabilite conditionnelle pour toutes les modalités de chaque variable
-      proba_explicative <- prop.table(table_freq, 2)
-      NBAYES$table_proba_cond[[colnames(df_disc$Disc.data[i])]] <- prop.table(table_freq, 2)
+      nrow_tbl <- nrow(table_freq)
+      if (nrow_tbl == 1) {
+        proba_explicative <- prop.table(table_freq, 1)
+      } else if (nrow_tbl > 1) {
+        proba_explicative <- prop.table(table_freq, 2)
+      }
+      NBAYES$table_proba_cond[[colnames(df_disc$Disc.data[i])]] <- proba_explicative
     }
 
     # Probabilites A Priori

@@ -87,7 +87,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
       ###### PARALLELISATION ######
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
-      pred <- foreach(i=1:nrow(test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
+      pred <- foreach(i=1:nrow(data_test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
       stopCluster(cl)
 
 
@@ -111,7 +111,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
       nb_cores <- detectCores() - 1
       cl <- makeCluster(nb_cores)
       registerDoParallel(cl)
-      pred <- foreach(i=1:nrow(test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
+      pred <- foreach(i=1:nrow(data_test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
       stopCluster(cl)
     }
 
@@ -176,7 +176,7 @@ predict.NBAYES <- function(object_NBAYES, data_test, type="both", parallel=FALSE
     cl <- makeCluster(nb_cores)
 
     registerDoParallel(cl)
-    pred <- foreach(i=1:nrow(test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
+    pred <- foreach(i=1:nrow(data_test), .combine=rbind, .export=c("proba_1_obs")) %dopar% proba_1_obs(data_test[i,], object_NBAYES)
     stopCluster(cl)
 
     evidence_par <- seq(1, nrow(pred))

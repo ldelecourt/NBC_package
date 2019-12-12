@@ -19,12 +19,17 @@
 #' @export
 
 #Surcharge de la methode print
-print.NBAYES<-function(NBAYES){
+print.NBAYES <- function(NBAYES){
   for (i in 1:length(NBAYES$table_proba_cond)){
-    cat("Conditionnal Probabilities for the variable",names(NBAYES$table_proba_cond[i])," :","\n")
+    cat("Conditionnal Probabilities for the variable",names(NBAYES$table_proba_cond[i]),":","\n")
     print(NBAYES$table_proba_cond[[i]])
     cat("\n")
   }
-  cat("Prior probability :","\n")
+  cat("Prior probability:","\n")
   print(NBAYES$prior)
+
+  if (exists("NBAYES$cuts")) {
+    cat("Cuts:", "\n")
+    print(NBAYES$cuts)
+  }
 }
